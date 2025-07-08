@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - BlogHub{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="mb-8 flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Admin Panel</h1>
+            <p class="text-gray-600">Manage blog submissions and platform content</p>
+        </div>
+        <!-- <div class="flex items-center space-x-3">
+            <a href="{{ url_for('home') }}" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg font-medium transition duration-300">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Site
+            </a>
+            <a href="{{ url_for('logout') }}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+            </a>
+        </div> -->
+    </div>
+    
+    <!-- Admin Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900">{{ pending_blogs|length }}</h3>
+                    <p class="text-gray-600">Pending Review</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900">
+                        {{ all_blogs|selectattr('status', 'equalto', 'published')|list|length }}
+                    </h3>
+                    <p class="text-gray-600">Published</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900">
+                        {{ all_blogs|selectattr('status', 'equalto', 'rejected')|list|length }}
+                    </h3>
+                    <p class="text-gray-600">Rejected</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-newspaper text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900">{{ all_blogs|length }}</h3>
+                    <p class="text-gray-600">Total Blogs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pending Blogs Section -->
+    <div class="bg-white rounded-lg shadow-md border border-gray-200 mb-8">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-900">
+                <i class="fas fa-clock mr-2 text-yellow-600"></i>Pending Review
+            </h2>
+            <p class="text-gray-600 mt-1">Blogs waiting for approval or rejection</p>
+        </div>
+        
+        {% if pending_blogs %}
+            <div class="divide-y divide-gray-200">
+                {% for blog in pending_blogs %}
+                    <div class="p-6 hover:bg-gray-50 transition duration-300">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-3">
+                                    <h3 class="text-xl font-semibold text-gray-900">{{ blog.title }}</h3>
+                                    <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-medium">
+                                        {{ blog.category }}
+                                    </span>
+                                </div>
+                                
+                                <p class="text-gray-600 mb-4 line-clamp-3">
+                                    {{ blog.content[:300] }}{% if blog.content|length > 300 %}...{% endif %}
+                                </p>
+                                
+                                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                    <span>
+                                        <i class="fas fa-user mr-1"></i>
+                                        {{ blog.author_username }}
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-calendar mr-1"></i>
+                                        {{ blog.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-file-alt mr-1"></i>
+                                        {{ blog.content|length }} characters
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-2 ml-6">
+                                <a href="{{ url_for('view_blog', blog_id=blog._id) }}" 
+                                   class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-300">
+                                    <i class="fas fa-eye mr-1"></i>Preview
+                                </a>
+                                <a href="{{ url_for('approve_blog', blog_id=blog._id) }}" 
+                                   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-300"
+                                   onclick="return confirm('Are you sure you want to approve this blog?')">
+                                    <i class="fas fa-check mr-1"></i>Approve
+                                </a>
+                                <a href="{{ url_for('reject_blog', blog_id=blog._id) }}" 
+                                   class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-300"
+                                   onclick="return confirm('Are you sure you want to reject this blog?')">
+                                    <i class="fas fa-times mr-1"></i>Reject
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="p-12 text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">All Caught Up!</h3>
+                <p class="text-gray-600">No blogs are currently pending review.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- All Blogs Section -->
+    <div class="bg-white rounded-lg shadow-md border border-gray-200">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-900">
+                <i class="fas fa-list mr-2 text-blue-600"></i>All Blogs
+            </h2>
+            <p class="text-gray-600 mt-1">Complete overview of all blog submissions</p>
+        </div>
+        
+        {% if all_blogs %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Blog
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Author
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Category
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Date
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for blog in all_blogs %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                                <i class="fas fa-file-alt text-gray-600"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">{{ blog.title }}</div>
+                                            <div class="text-sm text-gray-500">{{ blog.content[:50] }}...</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ blog.author_username }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="bg-primary text-white px-2 py-1 rounded-full text-xs">
+                                        {{ blog.category }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium
+                                        {% if blog.status == 'published' %}
+                                            bg-green-100 text-green-800
+                                        {% elif blog.status == 'pending' %}
+                                            bg-yellow-100 text-yellow-800
+                                        {% elif blog.status == 'rejected' %}
+                                            bg-red-100 text-red-800
+                                        {% endif %}">
+                                        {{ blog.status.title() }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ blog.created_at.strftime('%b %d, %Y') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <a href="{{ url_for('view_blog', blog_id=blog._id) }}" 
+                                       class="text-primary hover:text-secondary mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if blog.status == 'pending' %}
+                                        <a href="{{ url_for('approve_blog', blog_id=blog._id) }}" 
+                                           class="text-green-600 hover:text-green-800 mr-3"
+                                           onclick="return confirm('Approve this blog?')">
+                                            <i class="fas fa-check"></i>
+                                        </a>
+                                        <a href="{{ url_for('reject_blog', blog_id=blog._id) }}" 
+                                           class="text-red-600 hover:text-red-800"
+                                           onclick="return confirm('Reject this blog?')">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="p-12 text-center">
+                <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-newspaper text-gray-400 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">No Blogs Yet</h3>
+                <p class="text-gray-600">No blogs have been submitted to the platform.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

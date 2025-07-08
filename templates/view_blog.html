@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}{{ blog.title }} - BlogHub{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Blog Header -->
+    <div class="bg-white rounded-lg shadow-md p-8 border border-gray-200 mb-8">
+        <div class="mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <span class="bg-primary text-white px-4 py-2 rounded-full text-sm font-medium">
+                    {{ blog.category }}
+                </span>
+                <span class="text-sm text-gray-500">
+                    <i class="fas fa-calendar mr-1"></i>
+                    {{ blog.created_at.strftime('%B %d, %Y') }}
+                </span>
+            </div>
+            
+            <h1 class="text-4xl font-bold text-gray-900 mb-4 leading-tight">{{ blog.title }}</h1>
+            
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-gray-600"></i>
+                </div>
+                <div>
+                    <p class="font-medium text-gray-900">{{ blog.author_username }}</p>
+                    <p class="text-sm text-gray-500">Author</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Blog Content -->
+    <div class="bg-white rounded-lg shadow-md p-8 border border-gray-200 mb-8">
+        <article class="prose prose-lg max-w-none">
+            <div class="text-gray-800 leading-relaxed text-lg">
+                {% for paragraph in blog.content.split('\n\n') %}
+                    {% if paragraph.strip() %}
+                        <p class="mb-6">{{ paragraph }}</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </article>
+    </div>
+    
+    <!-- Blog Footer -->
+    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200 mb-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-heart text-red-500"></i>
+                    <span class="text-gray-600">Like this story</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-share text-blue-500"></i>
+                    <span class="text-gray-600">Share</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-500">
+                    <i class="fas fa-eye mr-1"></i>
+                    Reading time: ~{{ (blog.content|length / 200)|round|int }} min
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Author Info -->
+    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200 mb-8">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+            <i class="fas fa-user mr-2"></i>About the Author
+        </h3>
+        <div class="flex items-center space-x-4">
+            <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+                <i class="fas fa-user text-white text-xl"></i>
+            </div>
+            <div>
+                <h4 class="font-semibold text-gray-900">{{ blog.author_username }}</h4>
+                <p class="text-gray-600">BlogHub Contributor</p>
+                <p class="text-sm text-gray-500 mt-1">
+                    Sharing stories and experiences with the BlogHub community
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related Content -->
+    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+            <i class="fas fa-tags mr-2"></i>More from {{ blog.category }}
+        </h3>
+        <div class="text-center py-8">
+            <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-search text-gray-400 text-xl"></i>
+            </div>
+            <p class="text-gray-600 mb-4">Discover more stories in this category</p>
+            <a href="{{ url_for('category_blogs', category_name=blog.category) }}" 
+               class="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                <i class="fas fa-arrow-right mr-2"></i>Browse {{ blog.category }}
+            </a>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="flex items-center justify-between mt-8">
+        <a href="{{ url_for('home') }}" 
+           class="flex items-center text-gray-600 hover:text-primary transition duration-300">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Home
+        </a>
+        
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('create_blog') }}" 
+               class="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                <i class="fas fa-plus mr-2"></i>Write Your Story
+            </a>
+        {% else %}
+            <a href="{{ url_for('register') }}" 
+               class="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                <i class="fas fa-user-plus mr-2"></i>Join BlogHub
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.prose {
+    color: #374151;
+    line-height: 1.75;
+}
+
+.prose p {
+    margin-bottom: 1.5rem;
+    text-align: justify;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    color: #111827;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.prose h1 {
+    font-size: 2.25rem;
+}
+
+.prose h2 {
+    font-size: 1.875rem;
+}
+
+.prose h3 {
+    font-size: 1.5rem;
+}
+
+.prose ul, .prose ol {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+}
+
+.prose li {
+    margin-bottom: 0.5rem;
+}
+
+.prose blockquote {
+    border-left: 4px solid #3B82F6;
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: #6B7280;
+}
+
+.prose code {
+    background-color: #F3F4F6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    color: #DC2626;
+}
+
+.prose pre {
+    background-color: #1F2937;
+    color: #F9FAFB;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+}
+
+.prose pre code {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+}
+</style>
+{% endblock %} 

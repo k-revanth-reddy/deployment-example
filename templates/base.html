@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Blogging Platform{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#F59E0B'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{{ url_for('home') }}" class="flex items-center space-x-2">
+                        <i class="fas fa-blog text-2xl text-primary"></i>
+                        <span class="text-xl font-bold text-gray-900">BlogHub</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    {% if not request.endpoint == 'admin_panel' %}
+                        <a href="{{ url_for('home') }}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-home mr-1"></i>Home
+                        </a>
+                        
+                        {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('create_blog') }}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-plus mr-1"></i>Write Blog
+                            </a>
+                            <a href="{{ url_for('my_blogs') }}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-user mr-1"></i>My Blogs
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin %}
+                            <a href="{{ url_for('admin_panel') }}" class="text-red-600 hover:text-red-800 px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-cog mr-1"></i>Admin
+                            </a>
+                        {% endif %}
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-700">Welcome, {{ current_user.username }}</span>
+                            <a href="{{ url_for('logout') }}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                            </a>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-sign-in-alt mr-1"></i>Login
+                        </a>
+                        <a href="{{ url_for('register') }}" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-user-plus mr-1"></i>Register
+                        </a>
+                        <a href="{{ url_for('admin_login') }}" class="bg-accent hover:bg-yellow-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-cog mr-1"></i>Admin
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                {% for category, message in messages %}
+                    <div class="mb-4 p-4 rounded-md {% if category == 'error' %}bg-red-100 border border-red-400 text-red-700{% else %}bg-green-100 border border-green-400 text-green-700{% endif %}">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                {% if category == 'error' %}
+                                    <i class="fas fa-exclamation-circle"></i>
+                                {% else %}
+                                    <i class="fas fa-check-circle"></i>
+                                {% endif %}
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium">{{ message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p>&copy; 2024 BlogHub. All rights reserved.</p>
+                <p class="text-gray-400 mt-2">A multi-user blogging platform</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 

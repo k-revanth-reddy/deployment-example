@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category_name }} - BlogHub{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Category Header -->
+    <div class="bg-gradient-to-r from-primary to-secondary text-white rounded-lg shadow-xl mb-8">
+        <div class="px-8 py-12 text-center">
+            <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-tag text-white text-3xl"></i>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ category_name }}</h1>
+            <p class="text-xl opacity-90 mb-6">Discover amazing stories in {{ category_name.lower() }}</p>
+            <div class="flex items-center justify-center space-x-4 text-sm">
+                <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full">
+                    <i class="fas fa-newspaper mr-1"></i>{{ blogs|length }} stories
+                </span>
+                <a href="{{ url_for('home') }}" class="bg-white text-primary px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition duration-300">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Category Description -->
+    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200 mb-8">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-info-circle text-primary text-xl mr-3"></i>
+            <h2 class="text-2xl font-bold text-gray-900">About {{ category_name }}</h2>
+        </div>
+        <p class="text-gray-600 leading-relaxed">
+            {% for category in categories %}
+                {% if category.name == category_name %}
+                    {{ category.description }}
+                {% endif %}
+            {% endfor %}
+        </p>
+    </div>
+    
+    <!-- Blogs Grid -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-3xl font-bold text-gray-900">Latest Stories</h2>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('create_blog') }}" 
+                   class="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                    <i class="fas fa-plus mr-2"></i>Write in {{ category_name }}
+                </a>
+            {% endif %}
+        </div>
+        
+        {% if blogs %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for blog in blogs %}
+                    <article class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 overflow-hidden border border-gray-200">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="bg-primary text-white px-3 py-1 rounded-full text-xs font-medium">
+                                    {{ blog.category }}
+                                </span>
+                                <span class="text-sm text-gray-500">
+                                    {{ blog.created_at.strftime('%b %d, %Y') }}
+                                </span>
+                            </div>
+                            
+                            <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                                <a href="{{ url_for('view_blog', blog_id=blog._id) }}" class="hover:text-primary transition duration-300">
+                                    {{ blog.title }}
+                                </a>
+                            </h3>
+                            
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                {{ blog.content[:150] }}{% if blog.content|length > 150 %}...{% endif %}
+                            </p>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-gray-600 text-sm"></i>
+                                    </div>
+                                    <span class="text-sm text-gray-700">{{ blog.author_username }}</span>
+                                </div>
+                                
+                                <a href="{{ url_for('view_blog', blog_id=blog._id) }}" 
+                                   class="text-primary hover:text-secondary font-medium text-sm">
+                                    Read More <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-16">
+                <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-newspaper text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">No Stories Yet</h3>
+                <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                    Be the first to share a story in the {{ category_name.lower() }} category!
+                </p>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('create_blog') }}" 
+                       class="bg-primary hover:bg-secondary text-white px-8 py-3 rounded-lg font-medium transition duration-300">
+                        <i class="fas fa-plus mr-2"></i>Write the First Story
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('register') }}" 
+                       class="bg-primary hover:bg-secondary text-white px-8 py-3 rounded-lg font-medium transition duration-300">
+                        <i class="fas fa-user-plus mr-2"></i>Join and Start Writing
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Other Categories -->
+    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+            <i class="fas fa-compass mr-2"></i>Explore Other Categories
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {% for category in categories %}
+                {% if category.name != category_name %}
+                    <a href="{{ url_for('category_blogs', category_name=category.name) }}" 
+                       class="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition duration-300 border border-gray-200 hover:border-primary">
+                        <div class="text-center">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-tag text-white text-sm"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 text-sm">{{ category.name }}</h3>
+                            <p class="text-xs text-gray-600 mt-1">{{ category.description[:30] }}...</p>
+                        </div>
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Category Stats -->
+    <div class="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+            <i class="fas fa-chart-bar mr-2"></i>{{ category_name }} Statistics
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-primary">{{ blogs|length }}</div>
+                <div class="text-sm text-gray-600">Total Stories</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-green-600">
+                    {% set unique_authors = blogs|map(attribute='author_username')|unique|list %}
+                    {{ unique_authors|length }}
+                </div>
+                <div class="text-sm text-gray-600">Unique Authors</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-purple-600">
+                    {% if blogs %}
+                        {{ (blogs|map(attribute='created_at')|sort|first).strftime('%b %Y') }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </div>
+                <div class="text-sm text-gray-600">First Story</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

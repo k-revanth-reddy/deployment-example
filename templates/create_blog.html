@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Create Blog - BlogHub{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Write Your Story</h1>
+        <p class="text-gray-600">Share your thoughts, experiences, and ideas with the world</p>
+    </div>
+    
+    <form method="POST" class="bg-white rounded-lg shadow-md p-8 border border-gray-200">
+        <div class="space-y-6">
+            <!-- Title -->
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-heading mr-2"></i>Blog Title
+                </label>
+                <input type="text" id="title" name="title" required
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-300"
+                       placeholder="Enter an engaging title for your blog">
+            </div>
+            
+            <!-- Category -->
+            <div>
+                <label for="category" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-tag mr-2"></i>Category
+                </label>
+                <select id="category" name="category" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-300">
+                    <option value="">Select a category</option>
+                    {% for category in categories %}
+                        <option value="{{ category.name }}">{{ category.name }} - {{ category.description }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Content -->
+            <div>
+                <label for="content" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-edit mr-2"></i>Blog Content
+                </label>
+                <textarea id="content" name="content" rows="15" required
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-300 resize-vertical"
+                          placeholder="Write your story here... You can use markdown formatting for better presentation."></textarea>
+                <p class="text-sm text-gray-500 mt-2">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Your blog will be reviewed by our team before publication
+                </p>
+            </div>
+            
+            <!-- Writing Tips -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 class="text-lg font-semibold text-blue-900 mb-3">
+                    <i class="fas fa-lightbulb mr-2"></i>Writing Tips
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-800">
+                    <div>
+                        <h4 class="font-medium mb-1">Structure</h4>
+                        <ul class="space-y-1">
+                            <li>• Start with a compelling introduction</li>
+                            <li>• Use clear headings and paragraphs</li>
+                            <li>• End with a strong conclusion</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-medium mb-1">Content</h4>
+                        <ul class="space-y-1">
+                            <li>• Be authentic and personal</li>
+                            <li>• Include examples and stories</li>
+                            <li>• Engage with your readers</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                <a href="{{ url_for('my_blogs') }}" 
+                   class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition duration-300">
+                    <i class="fas fa-arrow-left mr-2"></i>Cancel
+                </a>
+                
+                <button type="submit" 
+                        class="px-8 py-3 bg-primary hover:bg-secondary text-white rounded-lg font-medium transition duration-300">
+                    <i class="fas fa-paper-plane mr-2"></i>Submit for Review
+                </button>
+            </div>
+        </div>
+    </form>
+    
+    <!-- Blog Status Info -->
+    <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <div class="flex items-start">
+            <i class="fas fa-clock text-yellow-600 text-xl mr-3 mt-1"></i>
+            <div>
+                <h3 class="text-lg font-semibold text-yellow-900 mb-2">Review Process</h3>
+                <p class="text-yellow-800 mb-3">
+                    After submitting your blog, it will go through our review process to ensure quality content for our readers.
+                </p>
+                <div class="space-y-2 text-sm text-yellow-800">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span>Content quality and relevance check</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span>Grammar and formatting review</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span>Approval and publication</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-resize textarea
+document.getElementById('content').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+});
+
+// Character counter
+document.getElementById('content').addEventListener('input', function() {
+    const charCount = this.value.length;
+    const wordCount = this.value.trim().split(/\s+/).filter(word => word.length > 0).length;
+    
+    // You can add a character/word counter display here if needed
+});
+</script>
+{% endblock %} 
