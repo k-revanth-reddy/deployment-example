@@ -14,7 +14,7 @@ load_dotenv()
 
 def setup_admin():
     # Connect to MongoDB
-    client = MongoClient(os.getenv('MONGODB_URI', 'mongodb://localhost:27017/'))
+    client = MongoClient('mongodb+srv://arjun:arjun123@blog.dcjsvwf.mongodb.net/?retryWrites=true&w=majority&appName=Blog')
     db = client['blogging_platform']
     users_collection = db['users']
     
